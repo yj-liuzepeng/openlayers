@@ -9,53 +9,85 @@ import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
 import { Fill, Style, Text, Stroke } from "ol/style";
 
-
-/**
- * 根据起始点、终止点和步长生成网格
- * @param {Array<number>} startPosition - 左上角经纬度 [经度, 纬度]
- * @param {Array<number>} endPosition - 右下角经纬度 [经度, 纬度]
- * @param {number} lonStep - 经度步长
- * @param {number} latStep - 纬度步长
- * @returns {Array<Feature>} 生成的网格要素数组
- */
-const generateGrid = (startPosition, endPosition, lonStep, latStep) => {
-  const features = [];
-  let idCounter = 1; // 用于给每个长方形赋予一个简单的数字ID，从1开始
-
-  for (let lon = startPosition[0]; lon < endPosition[0]; lon += lonStep) {
-    for (let lat = startPosition[1]; lat > endPosition[1]; lat -= latStep) {
-      const squareCoords = [
-        [
-          [lon, lat],
-          [lon + lonStep, lat],
-          [lon + lonStep, lat - latStep],
-          [lon, lat - latStep],
-          [lon, lat], // 闭合长方形
-        ],
-      ];
-
-      const feature = new Feature({
-        geometry: new Polygon(squareCoords),
-        name: idCounter.toString(), // 将ID转换为字符串作为name
-      });
-
-      features.push(feature);
-      idCounter++; // 更新ID计数器
-    }
-  }
-
-  return features;
-};
-
-// 使用 generateGrid 函数生成网格并创建 VectorLayer
-const vectorSource = new VectorSource({
-  features: generateGrid([119.0, 29.2], [119.8, 28.2], 0.4, 0.2),
-});
-
+// 创建要素图层
 const vectorLayer = new VectorLayer({
-  source: vectorSource,
+  source: new VectorSource({
+    features: [
+      new Feature({
+        geometry: new Polygon([
+          [
+            [119.0, 29.0],
+            [119.2, 29.0],
+            [119.2, 29.2],
+            [119.0, 29.2], // 最左上角点
+            [119.0, 29.0],
+          ],
+        ]),
+        name: "A",
+      }),
+      new Feature({
+        geometry: new Polygon([
+          [
+            [119.2, 29.0],
+            [119.4, 29.0],
+            [119.4, 29.2],
+            [119.2, 29.2],
+            [119.2, 29.0],
+          ],
+        ]),
+        name: "B",
+      }),
+      new Feature({
+        geometry: new Polygon([
+          [
+            [119.4, 29.0],
+            [119.6, 29.0],
+            [119.6, 29.2],
+            [119.4, 29.2],
+            [119.4, 29.0],
+          ],
+        ]),
+        name: "C",
+      }),
+      new Feature({
+        geometry: new Polygon([
+          [
+            [119.0, 28.8],
+            [119.2, 28.8],
+            [119.2, 29.0],
+            [119.0, 29.0],
+            [119.0, 28.8],
+          ],
+        ]),
+        name: "D",
+      }),
+      new Feature({
+        geometry: new Polygon([
+          [
+            [119.2, 28.8],
+            [119.4, 28.8],
+            [119.4, 29.0],
+            [119.2, 29.0],
+            [119.2, 28.8],
+          ],
+        ]),
+        name: "E",
+      }),
+      new Feature({
+        geometry: new Polygon([
+          [
+            [119.4, 28.8],
+            [119.6, 28.8], // 最右下角点
+            [119.6, 29.0],
+            [119.4, 29.0],
+            [119.4, 28.8],
+          ],
+        ]),
+        name: "F",
+      }),
+    ],
+  }),
   style: function (feature) {
-    // 同原始代码中的样式设置
     return new Style({
       stroke: new Stroke({
         width: 4,
@@ -66,7 +98,7 @@ const vectorLayer = new VectorLayer({
       }),
       text: new Text({
         font: "10px Microsoft YaHei",
-        text: feature.get("name"),
+        text: feature.get("name"), // 设置显示文本为 feature 的 name 属性
         overflow: true,
         textAlign: "center",
         textBaseline: "middle",
