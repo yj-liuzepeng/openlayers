@@ -9,6 +9,7 @@ import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
 import { Fill, Style, Text, Stroke } from "ol/style";
 
+
 /**
  * 根据起始点、终止点和步长生成网格
  * @param {Array<number>} startPosition - 左上角经纬度 [经度, 纬度]
@@ -45,6 +46,42 @@ const generateGrid = (startPosition, endPosition, lonStep, latStep) => {
 
   return features;
 };
+// OSM转换成XYZ坐标系
+// const generateGrid = (startPosition, endPosition, lonStep, latStep) => {
+//   const features = []
+//   let idCounter = 1 // 用于给每个长方形赋予一个简单的数字ID，从1开始
+
+//   for (let lon = startPosition[0]; lon < endPosition[0]; lon += lonStep) {
+//     for (let lat = startPosition[1]; lat > endPosition[1]; lat -= latStep) {
+//       // 转换方格的四个角的坐标
+//       const bottomLeft = transform([lon, lat - latStep], 'EPSG:4326', 'EPSG:3857')
+//       const bottomRight = transform([lon + lonStep, lat - latStep], 'EPSG:4326', 'EPSG:3857')
+//       const topLeft = transform([lon, lat], 'EPSG:4326', 'EPSG:3857')
+//       const topRight = transform([lon + lonStep, lat], 'EPSG:4326', 'EPSG:3857')
+
+//       // 使用转换后的坐标创建方格
+//       const squareCoords = [
+//         [
+//           topLeft,
+//           topRight,
+//           bottomRight,
+//           bottomLeft,
+//           topLeft // 闭合长方形
+//         ]
+//       ]
+
+//       const feature = new Feature({
+//         geometry: new Polygon(squareCoords),
+//         name: idCounter.toString() // 将ID转换为字符串作为name
+//       })
+
+//       features.push(feature)
+//       idCounter++ // 更新ID计数器
+//     }
+//   }
+
+//   return features
+// }
 
 // 使用 generateGrid 函数生成网格并创建 VectorLayer
 const vectorSource = new VectorSource({
@@ -152,12 +189,6 @@ dragBox.on("boxend", function () {
   // 输出查询结果
   const msg = selected.join("、");
   document.getElementById("msg").innerText = "被选中的要素：" + msg;
-});
-
-// 监听地图的点击事件，点击时清除框选
-map.on("singleclick", function () {
-  select.getFeatures().clear();
-  document.getElementById("msg").innerText = "";
 });
 
 // 添加交互工具
