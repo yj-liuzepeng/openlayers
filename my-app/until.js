@@ -181,6 +181,33 @@ export function useMap() {
 
     map.value.addLayer(lineLayer)
   }
+  /** 添加气象信息图片 */
+const imageLayer = ref(null)
+const addImg = (data) => {
+  data.forEach((item) => {
+    const extent = boundingExtent([
+      // [item.minLng, item.maxLat], // 左上
+      [item.minLng, item.minLat], // 左下
+      // [item.maxLng, item.minLat], // 右下
+      [item.maxLng, item.maxLat] // 右上
+    ])
+    const projection = new Projection({
+      code: 'EPSG:4326',
+      extent
+    })
+    const image = new ImageStatic({
+      url: 'data:image/png;base64,' + item.imageCode,
+      projection,
+      imageExtent: extent
+    })
+    imageLayer.value = new ImageLayer({
+      source: image,
+      minResolution: 0,
+      maxResolution: Infinity
+    })
+    map.value.addLayer(imageLayer.value)
+  })
+}
   const resetMapCenter = (lng: number, lat: number) => {
     mapView.center = fromLonLat([
       lng,
